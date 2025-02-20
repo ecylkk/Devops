@@ -1,2 +1,7 @@
-FROM nginx:latest
-COPY index.html /usr/share/nginx/html/index.html
+FROM node:18
+WORKDIR /app
+COPY server.js .
+COPY index.html .
+RUN npm install express
+CMD ["node", "server.js"]
+EXPOSE 3000

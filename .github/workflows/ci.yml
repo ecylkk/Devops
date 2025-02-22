@@ -14,8 +14,10 @@ jobs:
       - name: Build Docker Image
         run: docker build -t my-app .
       - name: Deploy to Render
+        env:
+          RENDER_API_TOKEN: ${{ secrets.RENDER_API_TOKEN }}
         run: |
           curl -X POST \
-          -H "Authorization: Bearer ${{ secrets.RENDER_API_TOKEN }}" \
+          -H "Authorization: Bearer $RENDER_API_TOKEN" \
           -d '{"serviceId":"rnd_s51aVa3XIUTJpSTPnZaU3EezeZCa"}' \
           https://api.render.com/v1/services/redeploy

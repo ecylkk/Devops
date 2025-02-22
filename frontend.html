@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My DevOps Frontend</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #response { margin-top: 20px; color: #333; }
+        #loading { display: none; color: #666; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Welcome to My App</h1>
+    <button onclick="fetchAI()">Get AI Response</button>
+    <div id="loading">Loading...</div>
+    <div id="response" style="white-space: pre-wrap; max-width: 300px; overflow: hidden; text-overflow: ellipsis;"></div>
+    
+    <script>
+        async function fetchAI() {
+            const loading = document.getElementById('loading');
+            const responseDiv = document.getElementById('response');
+            loading.style.display = 'block';
+            responseDiv.innerText = '';
+            try {
+                const res = await fetch('http://localhost:3000/ai');
+                const data = await res.json();
+                if (data.error) throw new Error(data.error);
+                responseDiv.innerText = data.ai;
+            } catch (error) {
+                responseDiv.innerText = `Error: ${error.message}`;
+                responseDiv.className = 'error';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

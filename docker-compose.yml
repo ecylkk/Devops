@@ -5,3 +5,5 @@ services:
     ports:
       - "3000:3000"
     container_name: my-app
+    environment:
+   

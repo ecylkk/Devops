@@ -4,15 +4,14 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 const app = express();
-const port = process.env.PORT || 3000; // 支持 Render 的动态端口
+const port = process.env.PORT || 3000;
 
-const API_TOKEN =  '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'; // 你的 Key
-// const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/ai_db'; // 支持外部 MongoDB
-const MONGO_URI = 'mongodb+srv://ecylkk:2025Pass.@cluster0.0nhoz.mongodb.net/ai_db?retryWrites=true&w=majority&appName=Cluster0';
+const API_TOKEN = process.env.HF_API_TOKEN || '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';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb+srv://ecylkk:2025Pass.@cluster0.0nhoz.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
-mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB error:', err));
+mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 30000 })
+  .then(() => console.log('MongoDB connected successfully'))
+  .catch(err => console.error('MongoDB connection failed:', err.message));
 
 const ResponseSchema = new mongoose.Schema({
   text: String,
@@ -21,14 +20,15 @@ const ResponseSchema = new mongoose.Schema({
 });
 const Response = mongoose.model('Response', ResponseSchema);
 
-app.use(cors()); // 允许跨源请求
-app.use(express.static(path.join(__dirname, 'frontend', 'build'))); // 服务前端静态文件
+app.use(cors());
+app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
 app.get('/ai', async (req, res) => {
   const startTime = Date.now();
   try {
     const prompts = ["Hello, AI!", "What's up?", "Tell me a story!", "How's the weather?"];
     const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+    console.log('Sending request to HF with prompt:', randomPrompt);
     const response = await fetch('https://api-inference.huggingface.co/models/distilgpt2', {
       method: 'POST',
       headers: {
@@ -41,6 +41,7 @@ app.get('/ai', async (req, res) => {
       })
     });
     const data = await response.json();
+    console.log('HF response:', data);
     let aiText = data[0]?.generated_text || "AI failed";
     aiText = aiText.length > 20 ? aiText.substring(0, 20) + '...' : aiText;
 
@@ -49,7 +50,7 @@ app.get('/ai', async (req, res) => {
 
     res.json({ ai: aiText, time: responseTime });
   } catch (error) {
-    console.error('AI fetch error:', error);
+    console.error('AI fetch error:', error.message);
     res.status(500).json({ error: "AI call failed" });
   }
 });
@@ -59,7 +60,7 @@ app.get('/responses', async (req, res) => {
   res.json(responses);
 });
 
-app.get('*', (req, res) => { // 处理前端路由
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
 });
 

@@ -6,4 +6,5 @@ services:
       - "3000:3000"
     container_name: my-app
     environment:
+     - MONGO_URI=mongodb://mongo:27017/ai_db
    

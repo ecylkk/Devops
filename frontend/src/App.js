@@ -10,8 +10,8 @@ function App() {
   const fetchAI = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:3000/ai');
-      console.log('AI Response:', res.data); // 调试用
+      const res = await axios.get('/ai'); // 相对路径，支持 Render
+      console.log('AI Response:', res.data);
       setAiResponse(res.data.ai);
     } catch (error) {
       console.error('Fetch Error:', error);
@@ -22,8 +22,8 @@ function App() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/responses');
-      console.log('History Response:', res.data); // 调试用
+      const res = await axios.get('/responses'); // 相对路径
+      console.log('History Response:', res.data);
       setHistory(res.data);
     } catch (error) {
       console.error('History Fetch Error:', error);
